@@ -6,7 +6,10 @@ export const envSchema = z.object({
   // Pooled (transaction) connection used by the running app.
   DATABASE_URL: z
     .string()
-    .refine(v => /^postgres(ql)?:\/\//.test(v), 'must start with postgresql://'),
+    .refine(
+      v => /^postgres(ql)?:\/\//.test(v),
+      'must start with postgresql://',
+    ),
   // Comma-separated list of allowed browser origins.
   CORS_ORIGIN: z
     .string()
