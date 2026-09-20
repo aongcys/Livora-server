@@ -9,6 +9,7 @@
   "engines": {
     "node": ">=24"
   },
+  "packageManager": "pnpm@10.15.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "prisma",
@@ -26,6 +27,8 @@
     "db:studio": "dotenvx run -- prisma studio",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
     "dev": "dotenvx run -- nest start --watch",
     "start": "dotenvx run -- nest start",
     "start:dev": "dotenvx run -- nest start --watch",
