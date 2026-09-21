@@ -1,0 +1,42 @@
+erDiagram
+    USERS ||--o{ TASKS : owns
+    TASKS ||--o{ TASK_OCCURRENCES : "has exceptions"
+
+    USERS {
+        uuid id PK
+        string email UK "unique among non-deleted rows"
+        string username UK "unique among non-deleted rows, display only"
+        string password_hash
+        string avatar_url "nullable"
+        string gender "MALE | FEMALE"
+        string timezone "default Asia/Bangkok"
+        string role "USER | ADMIN, default USER"
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz deleted_at "nullable, soft delete"
+    }
+
+    TASKS {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string description "nullable"
+        date date "nullable"
+        time start_time "nullable"
+        time end_time "nullable"
+        string priority "LOW | MEDIUM | HIGH"
+        string status "TODO | IN_PROGRESS | DONE | CANCELLED | SKIPPED"
+        string repeat_type "NONE | DAILY | WEEKLY | MONTHLY | CUSTOM"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    TASK_OCCURRENCES {
+        uuid id PK
+        uuid task_id FK
+        date occurrence_date "unique with task_id"
+        string status "DONE | CANCELLED | SKIPPED"
+        timestamptz completed_at "nullable"
+        timestamptz created_at
+        timestamptz updated_at
+    }
