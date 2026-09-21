@@ -8,3 +8,112 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRole {
+  USER
+  ADMIN
+
+  @@map("user_role")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+
+  @@map("gender")
+}
+
+model User {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String
+  username     String
+  passwordHash String    @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  gender       Gender
+  timezone     String    @default("Asia/Bangkok")
+  role         UserRole  @default(USER)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3) @map("created_at")
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3) @map("updated_at")
+  deletedAt    DateTime? @db.Timestamptz(3) @map("deleted_at")
+
+  tasks Task[]
+
+  @@map("users")
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("task_priority")
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+  SKIPPED
+
+  @@map("task_status")
+}
+
+enum RepeatType {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+
+  @@map("repeat_type")
+}
+
+model Task {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  name        String
+  description String?
+  date        DateTime?    @db.Date
+  startTime   DateTime?    @map("start_time") @db.Time
+  endTime     DateTime?    @map("end_time") @db.Time
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus   @default(TODO)
+  repeatType  RepeatType   @default(NONE) @map("repeat_type")
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3) @map("created_at")
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  occurrences TaskOccurrence[]
+
+  @@index([userId, date])
+  @@index([userId, status])
+  @@map("tasks")
+}
+
+enum TaskOccurrenceStatus {
+  DONE
+  CANCELLED
+  SKIPPED
+
+  @@map("task_occurrence_status")
+}
+
+// A row here only exists when a specific date of a recurring task was acted
+// on (completed/cancelled/skipped). No row = still pending (TODO), derived
+// from the parent task's repeat_type + date.
+model TaskOccurrence {
+  id              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  taskId          String               @map("task_id") @db.Uuid
+  occurrenceDate  DateTime             @map("occurrence_date") @db.Date
+  status          TaskOccurrenceStatus
+  completedAt     DateTime?            @map("completed_at") @db.Timestamptz(3)
+  createdAt       DateTime             @default(now()) @db.Timestamptz(3) @map("created_at")
+  updatedAt       DateTime             @updatedAt @db.Timestamptz(3) @map("updated_at")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, occurrenceDate])
+  @@map("task_occurrences")
+}
