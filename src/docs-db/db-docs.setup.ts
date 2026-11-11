@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Express, Request, Response } from 'express';
 
-// schema.mmd is hand-maintained: update it (and DATABASE.md) whenever the
+// schema.mmd is hand-maintained: update it (and the matching file in Livora-Docs/database) whenever the
 // Prisma schema changes.
 const schemaSource = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'schema.mmd'),
